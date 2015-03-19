@@ -18,7 +18,7 @@
     "autoload": {
         "psr-4": {
             "Mlo\\FileLoader\\": "src",
-            "Mlo\\FileLoader\\": "tests"
+            "Mlo\\FileLoader\\Tests\\": "tests"
         }
     }
 }
