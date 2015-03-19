@@ -1,0 +1,4 @@
+vendor
+composer.lock
+Tests/cache/*
+!Tests/cache/.gitkeep

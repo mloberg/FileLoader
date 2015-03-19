@@ -1,0 +1,24 @@
+{
+    "name": "mlo/file-loader",
+    "description": "File loader with built in caching",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matthew Loberg",
+            "email": "loberg.matt@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/config": "~2.6",
+        "symfony/yaml": "~2.6"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mlo\\FileLoader\\": "src",
+            "Mlo\\FileLoader\\": "tests"
+        }
+    }
+}
