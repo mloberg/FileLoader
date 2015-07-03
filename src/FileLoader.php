@@ -1,4 +1,9 @@
 <?php
+/**
+ * FileLoader.php
+ *
+ * @package Mlo\FileLoader
+ */
 
 namespace Mlo\FileLoader;
 
@@ -11,15 +16,27 @@ use Symfony\Component\Config\Resource\FileResource;
 /**
  * FileLoader
  *
- * @author Matthew Loberg <mloberg@nerdery.com>
+ * @author Matthew Loberg <loberg.matt@gmail.com>
  */
-class FileLoader 
+class FileLoader
 {
+    /**
+     * @var array
+     */
     private $directories;
 
+    /**
+     * @var string
+     */
     private $cacheDirectory;
 
-    function __construct($cacheDirectory, array $directories = array())
+    /**
+     * Constructor
+     *
+     * @param string $cacheDirectory
+     * @param array  $directories
+     */
+    public function __construct($cacheDirectory, array $directories = array())
     {
         $this->cacheDirectory = $cacheDirectory;
         $this->directories    = $directories;

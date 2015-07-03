@@ -1,4 +1,9 @@
 <?php
+/**
+ * YamlFileLoader.php
+ *
+ * @package Mlo\FileLoader
+ */
 
 namespace Mlo\FileLoader;
 
@@ -8,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * YamlFileLoader
  *
- * @author Matthew Loberg <mloberg@nerdery.com>
+ * @author Matthew Loberg <loberg.matt@gmail.com>
  */
 class YamlFileLoader extends SymfonyFileLoader
 {
