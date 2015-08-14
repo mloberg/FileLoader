@@ -17,8 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Mlo\\FileLoader\\": "src",
-            "Mlo\\FileLoader\\Tests\\": "tests"
+            "Mlo\\FileLoader\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mlo\\FileLoader\\Tests\\": "tests/"
         }
     }
 }
