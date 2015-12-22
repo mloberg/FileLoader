@@ -36,7 +36,7 @@ class FileLoader
      * @param string $cacheDirectory
      * @param array  $directories
      */
-    public function __construct($cacheDirectory, array $directories = array())
+    public function __construct($cacheDirectory, array $directories = [])
     {
         $this->cacheDirectory = $cacheDirectory;
         $this->directories    = $directories;
@@ -124,7 +124,7 @@ class FileLoader
 
             $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
 
-            $cache->write($retval, array($resource));
+            $cache->write($retval, [$resource]);
         } else {
             $values = require((string) $cache);
         }
