@@ -1,4 +1,5 @@
 vendor
+build
 composer.lock
 Tests/cache/*
 !Tests/cache/.gitkeep
