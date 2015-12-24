@@ -10,9 +10,7 @@ use Mlo\FileLoader\YamlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
 /**
- * YamlFileLoaderTest
- *
- * @author Matthew Loberg <mloberg@nerdery.com>
+ * @coversDefaultClass \Mlo\FileLoader\YamlFileLoader
  */
 class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +28,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers YamlFileLoader::supports
+     * @covers ::supports
      */
     public function testSupports()
     {
@@ -41,7 +39,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers YamlFileLoader::load
+     * @covers ::load
      */
     public function testLoad()
     {
