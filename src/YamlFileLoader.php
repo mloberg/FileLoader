@@ -31,6 +31,12 @@ class YamlFileLoader extends BaseFileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
+        if (!is_string($resource)) {
+            return false;
+        }
+
+        $extension = pathinfo($resource, PATHINFO_EXTENSION);
+
+        return 'yaml' === $extension || 'yml' === $extension;
     }
 }
