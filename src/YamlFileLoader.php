@@ -1,13 +1,12 @@
 <?php
-/**
- * YamlFileLoader.php
- *
- * @package Mlo\FileLoader
+/*
+ * Copyright (c) 2015 Matthew Loberg
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
  */
 
 namespace Mlo\FileLoader;
 
-use Symfony\Component\Config\Loader\FileLoader as SymfonyFileLoader;
+use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -15,10 +14,10 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Matthew Loberg <loberg.matt@gmail.com>
  */
-class YamlFileLoader extends SymfonyFileLoader
+class YamlFileLoader extends BaseFileLoader
 {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function load($resource, $type = null)
     {
@@ -28,7 +27,7 @@ class YamlFileLoader extends SymfonyFileLoader
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function supports($resource, $type = null)
     {

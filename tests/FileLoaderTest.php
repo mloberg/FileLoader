@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2015 Matthew Loberg
+ * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ */
 
 namespace Mlo\FileLoader\Tests;
 
