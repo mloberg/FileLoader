@@ -113,13 +113,10 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadFromCache()
     {
-        $meta = 'a:1:{i:0;C:46:"Symfony\Component\Config\Resource\FileResource":56:{s:48:"/Users/mloberg/src/FileLoader/tests/data/foo.yml";}}';
-        $data = '<?php return [ "bar" => "baz" ];';
-
-        file_put_contents($this->cacheDirectory . '/foo.yml.php.meta', $meta);
-        file_put_contents($this->cacheDirectory . '/foo.yml.php', $data);
-
         $this->loader->addDirectory($this->dataDirectory);
+        $this->loader->load('foo.yml');
+
+        file_put_contents($this->cacheDirectory . '/foo.yml.php', '<?php return [ "bar" => "baz" ];');
 
         $values = $this->loader->load('foo.yml');
 
@@ -131,13 +128,12 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadRefreshWillAlwaysPullFromFile()
     {
-        $meta = 'a:1:{i:0;C:46:"Symfony\Component\Config\Resource\FileResource":56:{s:48:"/Users/mloberg/src/FileLoader/tests/data/foo.yml";}}';
-        $data = '<?php return [ "bar" => "baz" ];';
-
-        file_put_contents($this->cacheDirectory . '/foo.yml.php.meta', $meta);
-        file_put_contents($this->cacheDirectory . '/foo.yml.php', $data);
-
         $this->loader->addDirectory($this->dataDirectory);
+        $this->loader->load('foo.yml');
+
+        file_put_contents($this->cacheDirectory . '/foo.yml.php', '<?php return [];');
+
+        $this->assertCount(0, $this->loader->load('foo.yml'));
 
         $values = $this->loader->load('foo.yml', true);
 
