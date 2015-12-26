@@ -9,40 +9,138 @@ namespace Mlo\FileLoader\Tests;
 use Mlo\FileLoader\FileLoader;
 
 /**
- * FileLoaderTest
- *
- * @author Matthew Loberg <mloberg@nerdery.com>
+ * @coversDefaultClass \Mlo\FileLoader\FileLoader
  */
 class FileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Clear all cache files
+     * @var string
+     */
+    private $cacheDirectory;
+
+    /**
+     * @var string
+     */
+    private $dataDirectory;
+
+    /**
+     * @var FileLoader
+     */
+    private $loader;
+
+    /**
+     * @inheritdoc
      */
     protected function setUp()
     {
-        foreach (glob(__DIR__.DIRECTORY_SEPARATOR.'cache/*') as $file) {
+        $this->cacheDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, 'cache']);
+        $this->dataDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, 'data']);
+
+        foreach (glob($this->cacheDirectory . '/*') as $file) {
             if (is_file($file)) {
                 unlink($file);
             }
         }
+
+        $this->loader = new FileLoader($this->cacheDirectory);
     }
 
     /**
-     * Test file loader
+     * @covers ::__construct
      */
-    public function testFileLoader()
+    public function testConstructor()
     {
-        $cacheDir = __DIR__.DIRECTORY_SEPARATOR.'cache';
-        $dataDir = __DIR__.DIRECTORY_SEPARATOR.'data';
-        $loader = new FileLoader($cacheDir);
-        $loader->addDirectory($dataDir);
+        $loader = new FileLoader('foo', ['bar', 'baz']);
 
-        $this->assertFalse(file_exists($cacheDir.DIRECTORY_SEPARATOR.'test.yml.php'));
+        $this->assertEquals('foo', $loader->getCacheDirectory());
+        $this->assertCount(2, $loader->getDirectories());
+        $this->assertTrue(in_array('bar', $loader->getDirectories()));
+        $this->assertTrue(in_array('baz', $loader->getDirectories()));
+    }
 
-        $values = $loader->load('test.yml');
+    /**
+     * @covers ::getDirectories
+     * @covers ::setDirectories
+     * @covers ::addDirectory
+     */
+    public function testSetGetAddDirectories()
+    {
+        $this->assertCount(0, $this->loader->getDirectories());
+
+        $this->loader->setDirectories(['foo', 'bar']);
+
+        $this->assertCount(2, $this->loader->getDirectories());
+        $this->assertTrue(in_array('foo', $this->loader->getDirectories()));
+
+        $this->loader->addDirectory($this->dataDirectory);
+        $this->loader->addDirectory('foo');
+
+        $this->assertCount(3, $this->loader->getDirectories());
+        $this->assertTrue(in_array($this->dataDirectory, $this->loader->getDirectories()));
+    }
+
+    /**
+     * @covers ::getCacheDirectory
+     * @covers ::setCacheDirectory
+     */
+    public function testSetGetCacheDirectory()
+    {
+        $this->assertEquals($this->cacheDirectory, $this->loader->getCacheDirectory());
+
+        $this->loader->setCacheDirectory('foobar');
+
+        $this->assertEquals('foobar', $this->loader->getCacheDirectory());
+    }
+
+    /**
+     * @covers ::load
+     */
+    public function testLoad()
+    {
+        $this->loader->addDirectory($this->dataDirectory);
+
+        $this->assertFalse(file_exists($this->cacheDirectory . '/test.yml.php'));
+
+        $values = $this->loader->load('test.yml');
 
         $this->assertEquals('bar', $values['foo']);
 
-        $this->assertTrue(file_exists($cacheDir.DIRECTORY_SEPARATOR.'test.yml.php'));
+        $this->assertTrue(file_exists($this->cacheDirectory . '/test.yml.php'));
+    }
+
+    /**
+     * @covers ::load
+     */
+    public function testLoadFromCache()
+    {
+        $meta = 'a:1:{i:0;C:46:"Symfony\Component\Config\Resource\FileResource":56:{s:48:"/Users/mloberg/src/FileLoader/tests/data/foo.yml";}}';
+        $data = '<?php return [ "bar" => "baz" ];';
+
+        file_put_contents($this->cacheDirectory . '/foo.yml.php.meta', $meta);
+        file_put_contents($this->cacheDirectory . '/foo.yml.php', $data);
+
+        $this->loader->addDirectory($this->dataDirectory);
+
+        $values = $this->loader->load('foo.yml');
+
+        $this->assertEquals('baz', $values['bar']);
+    }
+
+    /**
+     * @covers ::load
+     */
+    public function testLoadRefreshWillAlwaysPullFromFile()
+    {
+        $meta = 'a:1:{i:0;C:46:"Symfony\Component\Config\Resource\FileResource":56:{s:48:"/Users/mloberg/src/FileLoader/tests/data/foo.yml";}}';
+        $data = '<?php return [ "bar" => "baz" ];';
+
+        file_put_contents($this->cacheDirectory . '/foo.yml.php.meta', $meta);
+        file_put_contents($this->cacheDirectory . '/foo.yml.php', $data);
+
+        $this->loader->addDirectory($this->dataDirectory);
+
+        $values = $this->loader->load('foo.yml', true);
+
+        $this->assertEquals('foobar', $values['test']);
     }
 }
