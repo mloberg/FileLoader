@@ -125,7 +125,7 @@ class FileLoader
 
             $cache->write($retval, [$resource]);
         } else {
-            $values = require($cache->getPath());
+            $values = require($cachePath);
         }
 
         return $values;
