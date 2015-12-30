@@ -113,14 +113,22 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadFromCache()
     {
+        $cacheFile = $this->cacheDirectory . '/foo.yml.php';
+
+        $this->assertFalse(file_exists($cacheFile));
+
         $this->loader->addDirectory($this->dataDirectory);
         $this->loader->load('foo.yml');
 
-        file_put_contents($this->cacheDirectory . '/foo.yml.php', '<?php return [ "bar" => "baz" ];');
+        $this->assertTrue(file_exists($cacheFile));
 
-        $values = $this->loader->load('foo.yml');
+        $fileModTime = filemtime($cacheFile);
 
-        $this->assertEquals('baz', $values['bar']);
+        sleep(1);
+
+        $this->loader->load('foo.yml');
+
+        $this->assertEquals($fileModTime, filemtime($cacheFile));
     }
 
     /**
@@ -128,15 +136,21 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadRefreshWillAlwaysPullFromFile()
     {
+        $cacheFile = $this->cacheDirectory . '/foo.yml.php';
+
+        $this->assertFalse(file_exists($cacheFile));
+
         $this->loader->addDirectory($this->dataDirectory);
         $this->loader->load('foo.yml');
 
-        file_put_contents($this->cacheDirectory . '/foo.yml.php', '<?php return [];');
+        $this->assertTrue(file_exists($cacheFile));
 
-        $this->assertCount(0, $this->loader->load('foo.yml'));
+        $fileModTime = filemtime($cacheFile);
 
-        $values = $this->loader->load('foo.yml', true);
+        sleep(1);
 
-        $this->assertEquals('foobar', $values['test']);
+        $this->loader->load('foo.yml', true);
+
+        $this->assertGreaterThan($fileModTime, filemtime($cacheFile));
     }
 }
