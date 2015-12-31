@@ -112,6 +112,7 @@ class FileLoader
 
             $loaderResolver = new LoaderResolver(array(
                 new YamlFileLoader($locator),
+                new JsonFileLoader($locator),
             ));
 
             $delegatingLoader = new DelegatingLoader($loaderResolver);

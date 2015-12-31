@@ -95,7 +95,7 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::load
      */
-    public function testLoad()
+    public function testLoadYaml()
     {
         $this->loader->addDirectory($this->dataDirectory);
 
@@ -106,6 +106,22 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $values['foo']);
 
         $this->assertTrue(file_exists($this->cacheDirectory . '/test.yml.php'));
+    }
+
+    /**
+     * @covers ::load
+     */
+    public function testLoadJson()
+    {
+        $this->loader->addDirectory($this->dataDirectory);
+
+        $this->assertFalse(file_exists($this->cacheDirectory . '/data.json.php'));
+
+        $values = $this->loader->load('data.json');
+
+        $this->assertEquals('bar', $values['foo']);
+
+        $this->assertTrue(file_exists($this->cacheDirectory . '/data.json.php'));
     }
 
     /**
