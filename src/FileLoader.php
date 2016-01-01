@@ -30,15 +30,29 @@ class FileLoader
     private $cacheDirectory;
 
     /**
+     * @var array
+     */
+    private $loaders;
+
+    /**
      * Constructor
      *
      * @param string $cacheDirectory
      * @param array  $directories
+     * @param array  $loaders
      */
-    public function __construct($cacheDirectory, array $directories = [])
+    public function __construct($cacheDirectory, array $directories = [], array $loaders = null)
     {
         $this->cacheDirectory = $cacheDirectory;
         $this->directories    = $directories;
+        $this->loaders        = $loaders;
+
+        if (null === $this->loaders) {
+            $this->loaders = [
+                __NAMESPACE__ . '\\JsonFileLoader',
+                __NAMESPACE__ . '\\YamlFileLoader',
+            ];
+        }
     }
 
     /**
@@ -94,10 +108,25 @@ class FileLoader
     }
 
     /**
+     * Add loader
+     *
+     * @param string $loader
+     *
+     * @return FileLoader
+     */
+    public function addLoader($loader)
+    {
+        $this->loaders[] = $loader;
+
+        return $this;
+    }
+
+    /**
      * Load from file
      *
      * @param string $fileName
      * @param bool   $refresh
+     *
      * @return mixed
      * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
@@ -110,16 +139,14 @@ class FileLoader
         if ($refresh || !$cache->isFresh()) {
             $locator = new FileLocator($this->getDirectories());
 
-            $loaderResolver = new LoaderResolver(array(
-                new YamlFileLoader($locator),
-                new JsonFileLoader($locator),
-            ));
-
-            $delegatingLoader = new DelegatingLoader($loaderResolver);
+            $loaderResolver = new LoaderResolver(array_map(function ($loader) use ($locator) {
+                return new $loader($locator);
+            }, $this->loaders));
 
             $filePath = $locator->locate($fileName);
             $resource = new FileResource($filePath);
 
+            $delegatingLoader = new DelegatingLoader($loaderResolver);
             $values = $delegatingLoader->load($filePath);
 
             $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
