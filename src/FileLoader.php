@@ -69,22 +69,30 @@ class FileLoader
      * Set directories
      *
      * @param array $directories
+     *
+     * @return FileLoader
      */
     public function setDirectories(array $directories)
     {
         $this->directories = $directories;
+
+        return $this;
     }
 
     /**
      * Add directory
      *
      * @param string $directory
+     *
+     * @return FileLoader
      */
     public function addDirectory($directory)
     {
         if (!in_array($directory, $this->directories)) {
             $this->directories[] = $directory;
         }
+
+        return $this;
     }
 
     /**
@@ -101,10 +109,14 @@ class FileLoader
      * Set cache directory
      *
      * @param string $cacheDirectory
+     *
+     * @return FileLoader
      */
     public function setCacheDirectory($cacheDirectory)
     {
         $this->cacheDirectory = $cacheDirectory;
+
+        return $this;
     }
 
     /**
