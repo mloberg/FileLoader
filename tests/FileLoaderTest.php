@@ -67,13 +67,13 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertCount(0, $this->loader->getDirectories());
 
-        $this->loader->setDirectories(['foo', 'bar']);
+        $this->assertSame($this->loader, $this->loader->setDirectories(['foo', 'bar']));
 
         $this->assertCount(2, $this->loader->getDirectories());
         $this->assertTrue(in_array('foo', $this->loader->getDirectories()));
 
-        $this->loader->addDirectory($this->dataDirectory);
-        $this->loader->addDirectory('foo');
+        $this->assertSame($this->loader, $this->loader->addDirectory($this->dataDirectory));
+        $this->assertSame($this->loader, $this->loader->addDirectory('foo'));
 
         $this->assertCount(3, $this->loader->getDirectories());
         $this->assertTrue(in_array($this->dataDirectory, $this->loader->getDirectories()));
@@ -87,9 +87,17 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($this->cacheDirectory, $this->loader->getCacheDirectory());
 
-        $this->loader->setCacheDirectory('foobar');
+        $this->assertSame($this->loader, $this->loader->setCacheDirectory('foobar'));
 
         $this->assertEquals('foobar', $this->loader->getCacheDirectory());
+    }
+
+    /**
+     * @covers ::addLoader
+     */
+    public function testAddLoader()
+    {
+        $this->assertSame($this->loader, $this->loader->addLoader('foo'));
     }
 
     /**
