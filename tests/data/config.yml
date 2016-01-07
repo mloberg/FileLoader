@@ -1,0 +1,9 @@
+database:
+  connections:
+    default:
+      username: foo
+      password: bar
+    test:
+      driver: sqlite
+      host: 127.0.0.1
+      username: root

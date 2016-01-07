@@ -7,6 +7,8 @@
 namespace Mlo\FileLoader;
 
 use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -139,7 +141,7 @@ class FileLoader
      * @param string $fileName
      * @param bool   $refresh
      *
-     * @return mixed
+     * @return array
      * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
     public function load($fileName, $refresh = false)
@@ -164,6 +166,39 @@ class FileLoader
             $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
 
             $cache->write($retval, [$resource]);
+        } else {
+            $values = require($cachePath);
+        }
+
+        return $values;
+    }
+
+    /**
+     * Load from file and apply configuration
+     *
+     * @param string                 $fileName
+     * @param ConfigurationInterface $configuration
+     * @param bool                   $refresh
+     *
+     * @return array
+     */
+    public function loadWithConfiguration($fileName, ConfigurationInterface $configuration, $refresh = false)
+    {
+        $tree = $configuration->getConfigTreeBuilder()->buildTree();
+        $name = $tree->getName();
+
+        $cachePath = $this->getCacheDirectory() . DIRECTORY_SEPARATOR . $fileName . '.config.' . $name . '.php';
+
+        $cache = new ConfigCache($cachePath, true);
+
+        if ($refresh || !$cache->isFresh()) {
+            $config = $this->load($fileName, $refresh);
+            $processor = new Processor();
+            $values = $processor->process($tree, $config);
+
+            $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
+
+            $cache->write($retval);
         } else {
             $values = require($cachePath);
         }
