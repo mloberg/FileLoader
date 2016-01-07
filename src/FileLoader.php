@@ -193,12 +193,16 @@ class FileLoader
 
         if ($refresh || !$cache->isFresh()) {
             $config = $this->load($fileName, $refresh);
+
+            $refClass = new \ReflectionClass(get_class($configuration));
+            $resource = new FileResource($refClass->getFileName());
+
             $processor = new Processor();
             $values = $processor->process($tree, $config);
 
             $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
 
-            $cache->write($retval);
+            $cache->write($retval, [$resource]);
         } else {
             $values = require($cachePath);
         }
