@@ -11,5 +11,6 @@ File loader with caching built in.
 
 ## Supported File Types
 
-* YAML
-* JSON
+* YAML (.yml/.yaml)
+* JSON (.json)
+* INI (.ini)
