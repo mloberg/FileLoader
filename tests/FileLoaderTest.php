@@ -132,6 +132,19 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(file_exists($this->cacheDirectory . '/data.json.php'));
     }
 
+    public function testLoadIni()
+    {
+        $this->loader->addDirectory($this->dataDirectory);
+
+        $this->assertFalse(file_exists($this->cacheDirectory . '/sample.ini.php'));
+
+        $values = $this->loader->load('sample.ini');
+
+        $this->assertEquals('BIRD', $values['animal']);
+
+        $this->assertTrue(file_exists($this->cacheDirectory . '/sample.ini.php'));
+    }
+
     /**
      * @covers ::load
      */

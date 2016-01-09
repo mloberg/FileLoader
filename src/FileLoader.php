@@ -53,6 +53,7 @@ class FileLoader
             $this->loaders = [
                 __NAMESPACE__ . '\\JsonFileLoader',
                 __NAMESPACE__ . '\\YamlFileLoader',
+                __NAMESPACE__ . '\\IniFileLoader',
             ];
         }
     }
