@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2015 Matthew Loberg
+ * Copyright (c) 2016 Matthew Loberg
  * Distributed under the MIT License (http://opensource.org/licenses/MIT)
  */
 
