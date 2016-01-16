@@ -1,6 +1,7 @@
 # File Loader
 
 [![Latest Stable Version](https://poser.pugx.org/mlo/file-loader/v/stable)](https://packagist.org/packages/mlo/file-loader)
+[![License](https://poser.pugx.org/mlo/file-loader/license)](https://packagist.org/packages/mlo/file-loader)
 [![Build Status](https://travis-ci.org/mloberg/FileLoader.svg?branch=master)](https://travis-ci.org/mloberg/FileLoader)
 [![Coverage Status](https://coveralls.io/repos/mloberg/FileLoader/badge.svg?branch=master&service=github)](https://coveralls.io/github/mloberg/FileLoader?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mloberg/FileLoader/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mloberg/FileLoader/?branch=master)
