@@ -6,14 +6,14 @@
 
 namespace Mlo\FileLoader;
 
-use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\Loader;
 
 /**
  * JsonFileLoader
  *
  * @author Matthew Loberg <loberg.matt@gmail.com>
  */
-class JsonFileLoader extends BaseFileLoader
+class JsonFileLoader extends Loader
 {
     /**
      * @inheritDoc

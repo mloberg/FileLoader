@@ -6,7 +6,7 @@
 
 namespace Mlo\FileLoader;
 
-use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @author Matthew Loberg <loberg.matt@gmail.com>
  */
-class YamlFileLoader extends BaseFileLoader
+class YamlFileLoader extends Loader
 {
     /**
      * @inheritdoc

@@ -6,14 +6,14 @@
 
 namespace Mlo\FileLoader;
 
-use Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use Symfony\Component\Config\Loader\Loader;
 
 /**
  * IniFileLoader
  *
  * @author Matthew Loberg <loberg.matt@gmail.com>
  */
-class IniFileLoader extends BaseFileLoader
+class IniFileLoader extends Loader
 {
     /**
      * @inheritDoc
