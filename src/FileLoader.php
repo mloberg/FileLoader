@@ -11,6 +11,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 
@@ -22,11 +23,6 @@ use Symfony\Component\Config\Resource\FileResource;
 class FileLoader
 {
     /**
-     * @var array
-     */
-    private $directories;
-
-    /**
      * @var string
      */
     private $cacheDirectory;
@@ -34,28 +30,52 @@ class FileLoader
     /**
      * @var array
      */
-    private $loaders;
+    private $directories;
+
+    /**
+     * @var LoaderInterface[]|array
+     */
+    private $loaders = [];
 
     /**
      * Constructor
      *
-     * @param string $cacheDirectory
-     * @param array  $directories
-     * @param array  $loaders
+     * @param string                  $cacheDirectory
+     * @param array|string            $directories
+     * @param LoaderInterface[]|array $loaders
      */
-    public function __construct($cacheDirectory, array $directories = [], array $loaders = null)
+    public function __construct($cacheDirectory, $directories = null, array $loaders = [])
     {
         $this->cacheDirectory = $cacheDirectory;
-        $this->directories    = $directories;
-        $this->loaders        = $loaders;
+        $this->directories    = (array) $directories;
 
-        if (null === $this->loaders) {
-            $this->loaders = [
-                __NAMESPACE__ . '\\JsonFileLoader',
-                __NAMESPACE__ . '\\YamlFileLoader',
-                __NAMESPACE__ . '\\IniFileLoader',
-            ];
+        foreach ($loaders as $loader) {
+            $this->addLoader($loader);
         }
+    }
+
+    /**
+     * Get cache directory
+     *
+     * @return string
+     */
+    public function getCacheDirectory()
+    {
+        return $this->cacheDirectory;
+    }
+
+    /**
+     * Set cache directory
+     *
+     * @param string $cacheDirectory
+     *
+     * @return FileLoader
+     */
+    public function setCacheDirectory($cacheDirectory)
+    {
+        $this->cacheDirectory = $cacheDirectory;
+
+        return $this;
     }
 
     /**
@@ -99,37 +119,23 @@ class FileLoader
     }
 
     /**
-     * Get cache directory
+     * Get Loaders
      *
-     * @return string
+     * @return LoaderInterface[]|array
      */
-    public function getCacheDirectory()
+    public function getLoaders()
     {
-        return $this->cacheDirectory;
-    }
-
-    /**
-     * Set cache directory
-     *
-     * @param string $cacheDirectory
-     *
-     * @return FileLoader
-     */
-    public function setCacheDirectory($cacheDirectory)
-    {
-        $this->cacheDirectory = $cacheDirectory;
-
-        return $this;
+        return $this->loaders;
     }
 
     /**
      * Add loader
      *
-     * @param string $loader
+     * @param LoaderInterface $loader
      *
      * @return FileLoader
      */
-    public function addLoader($loader)
+    public function addLoader(LoaderInterface $loader)
     {
         $this->loaders[] = $loader;
 
@@ -148,25 +154,20 @@ class FileLoader
     public function load($fileName, $refresh = false)
     {
         $cachePath = $this->getCacheDirectory() . DIRECTORY_SEPARATOR . $fileName . '.php';
-
-        $cache = new ConfigCache($cachePath, true);
+        $cache     = new ConfigCache($cachePath, true);
 
         if ($refresh || !$cache->isFresh()) {
-            $locator = new FileLocator($this->getDirectories());
-
-            $loaderResolver = new LoaderResolver(array_map(function ($loader) use ($locator) {
-                return new $loader($locator);
-            }, $this->loaders));
+            $resolver = new LoaderResolver($this->loaders);
+            $loader   = new DelegatingLoader($resolver);
+            $locator  = new FileLocator($this->getDirectories());
 
             $filePath = $locator->locate($fileName);
+            $values   = $loader->load($filePath);
             $resource = new FileResource($filePath);
 
-            $delegatingLoader = new DelegatingLoader($loaderResolver);
-            $values = $delegatingLoader->load($filePath);
+            $cacheValue = sprintf("<?php return %s;", var_export($values, true));
 
-            $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
-
-            $cache->write($retval, [$resource]);
+            $cache->write($cacheValue, [$resource]);
         } else {
             $values = require($cachePath);
         }

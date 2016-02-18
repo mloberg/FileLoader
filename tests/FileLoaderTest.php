@@ -7,6 +7,11 @@
 namespace Mlo\FileLoader\Tests;
 
 use Mlo\FileLoader\FileLoader;
+use Mlo\FileLoader\IniFileLoader;
+use Mlo\FileLoader\JsonFileLoader;
+use Mlo\FileLoader\YamlFileLoader;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
 /**
  * @coversDefaultClass \Mlo\FileLoader\FileLoader
@@ -33,8 +38,8 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cacheDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, 'cache']);
-        $this->dataDirectory = implode(DIRECTORY_SEPARATOR, [__DIR__, 'data']);
+        $this->cacheDirectory = __DIR__ . DIRECTORY_SEPARATOR . 'cache';
+        $this->dataDirectory  = __DIR__ . DIRECTORY_SEPARATOR . 'data';
 
         foreach (glob($this->cacheDirectory . '/*') as $file) {
             if (is_file($file)) {
@@ -42,7 +47,11 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
             }
         }
 
-        $this->loader = new FileLoader($this->cacheDirectory);
+        $this->loader = new FileLoader($this->cacheDirectory, null, [
+            new IniFileLoader(),
+            new JsonFileLoader(),
+            new YamlFileLoader(),
+        ]);
     }
 
     /**
@@ -93,11 +102,14 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getLoaders
      * @covers ::addLoader
      */
-    public function testAddLoader()
+    public function testGetAddLoaders()
     {
-        $this->assertSame($this->loader, $this->loader->addLoader('foo'));
+        $this->assertCount(3, $this->loader->getLoaders());
+        $this->assertSame($this->loader, $this->loader->addLoader(new TestFileLoader()));
+        $this->assertCount(4, $this->loader->getLoaders());
     }
 
     /**
@@ -221,5 +233,24 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->loader->loadWithConfiguration('config.yml', new Config(), true);
 
         $this->assertGreaterThan($fileModTime, filemtime($cacheFile));
+    }
+}
+
+class TestFileLoader implements LoaderInterface
+{
+    public function load($resource, $type = null)
+    {
+    }
+
+    public function supports($resource, $type = null)
+    {
+    }
+
+    public function getResolver()
+    {
+    }
+
+    public function setResolver(LoaderResolverInterface $resolver)
+    {
     }
 }
