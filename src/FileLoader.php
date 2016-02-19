@@ -38,16 +38,23 @@ class FileLoader
     private $loaders = [];
 
     /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
      * Constructor
      *
      * @param string                  $cacheDirectory
      * @param array|string            $directories
      * @param LoaderInterface[]|array $loaders
+     * @param bool                    $debug
      */
-    public function __construct($cacheDirectory, $directories = null, array $loaders = [])
+    public function __construct($cacheDirectory, $directories = null, array $loaders = [], $debug = false)
     {
         $this->cacheDirectory = $cacheDirectory;
         $this->directories    = (array) $directories;
+        $this->debug          = $debug;
 
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
@@ -74,6 +81,30 @@ class FileLoader
     public function setCacheDirectory($cacheDirectory)
     {
         $this->cacheDirectory = $cacheDirectory;
+
+        return $this;
+    }
+
+    /**
+     * Get Debug
+     *
+     * @return bool
+     */
+    public function isDebug()
+    {
+        return $this->debug;
+    }
+
+    /**
+     * Set Debug
+     *
+     * @param bool $debug
+     *
+     * @return FileLoader
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
 
         return $this;
     }
@@ -154,7 +185,7 @@ class FileLoader
     public function load($fileName, $refresh = false)
     {
         $cachePath = $this->getCacheDirectory() . DIRECTORY_SEPARATOR . $fileName . '.php';
-        $cache     = new ConfigCache($cachePath, true);
+        $cache     = new ConfigCache($cachePath, $this->debug);
 
         if ($refresh || !$cache->isFresh()) {
             $resolver = new LoaderResolver($this->loaders);
@@ -190,21 +221,19 @@ class FileLoader
         $name = $tree->getName();
 
         $cachePath = $this->getCacheDirectory() . DIRECTORY_SEPARATOR . $fileName . '.config.' . $name . '.php';
-
-        $cache = new ConfigCache($cachePath, true);
+        $cache     = new ConfigCache($cachePath, $this->debug);
 
         if ($refresh || !$cache->isFresh()) {
-            $config = $this->load($fileName, $refresh);
-
-            $refClass = new \ReflectionClass(get_class($configuration));
-            $resource = new FileResource($refClass->getFileName());
+            $reflection = new \ReflectionClass(get_class($configuration));
+            $resource   = new FileResource($reflection->getFileName());
 
             $processor = new Processor();
-            $values = $processor->process($tree, $config);
+            $config    = $this->load($fileName, $refresh);
+            $values    = $processor->process($tree, $config);
 
-            $retval = sprintf("<?php\nreturn %s;", var_export($values, true));
+            $cacheValue = sprintf("<?php return %s;", var_export($values, true));
 
-            $cache->write($retval, [$resource]);
+            $cache->write($cacheValue, [$resource]);
         } else {
             $values = require($cachePath);
         }
