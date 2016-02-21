@@ -113,6 +113,17 @@ class FileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::isDebug
+     * @covers ::setDebug
+     */
+    public function testDebug()
+    {
+        $this->assertFalse($this->loader->isDebug());
+        $this->assertSame($this->loader, $this->loader->setDebug(true));
+        $this->assertTrue($this->loader->isDebug());
+    }
+
+    /**
      * @covers ::load
      */
     public function testLoadYaml()
