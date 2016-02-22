@@ -34,9 +34,16 @@ The following versions of Symfony components are supported.
 ## Overview
 
 ```php
-$loader = new \Mlo\FileLoader\FileLoader('var/cache/loader', ['app/config']);
+$cacheDirectory = 'app/cache/config';
+$dataDirectory  = 'app/config';
 
-$values = $loader->load('config.yml');
+$loader = new \Mlo\FileLoader\FileLoader($cacheDirectory, $dataDirectory, [
+    new \Mlo\FileLoader\IniFileLoader(),
+    new \Mlo\FileLoader\JsonFileLoader(),
+    new \Mlo\FileLoader\YamlFileLoader(),
+]);
+
+$config = $loader->load('database.yml');
 ```
 
 ## Supported File Types
